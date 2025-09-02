@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACEest Fitness and Gym</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>ACEest Fitness Tracker</h1>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <ul>
+            {% for category, message in messages %}
+              <li style="color: {% if category == 'error' %}red{% else %}green{% endif %};">{{ message }}</li>
+            {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+        <form method="post" action="{{ url_for('index') }}">
+            Workout: <input type="text" name="workout">
+            Duration (minutes): <input type="text" name="duration">
+            <button type="submit">Add Workout</button>
+        </form>
+        <form method="post" action="{{ url_for('clear_workouts') }}">
+            <button type="submit">Clear All Workouts</button>
+        </form>
+        <h2>Logged Workouts</h2>
+        <ul>
+            {% for entry in workouts %}
+                <li>{{ entry.workout }} - {{ entry.duration }} minutes</li>
+            {% else %}
+                <li>No workouts logged yet.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>

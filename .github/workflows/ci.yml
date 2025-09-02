@@ -48,7 +48,7 @@ jobs:
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
       - name: Run pytest inside the container
-        run: docker run --rm aceest-fitness:ci pytest -q --junitxml=reports/junit.xml
+        run: docker run --rm aceest_fitness_flask:ci pytest -q --junitxml=reports/junit.xml
 
       - name: Upload test report artifact
         if: always()
