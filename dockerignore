@@ -14,7 +14,7 @@ venv/
 .coverage
 htmlcov/
 
-# macOS
+# MacOS
 .DS_Store
 
 # Git
@@ -24,6 +24,3 @@ htmlcov/
 # Editors/IDE
 .vscode/
 .idea/
-
-# Optional: exclude legacy GUI script if not needed in the container
-ACEest_Fitness.py
