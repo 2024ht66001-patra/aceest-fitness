@@ -1,58 +1,32 @@
-name: CI - Build & Test Inside Docker
+name: CI
 
 on:
   push:
-    branches: ["**"]
+    branches: [ main ]
   pull_request:
-    branches: ["**"]
-
-permissions:
-  contents: read
-
-concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: true
+    branches: [ main ]
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Cache Docker layers
-        uses: actions/cache@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
+          python-version: '3.10'
 
-      - name: Build image (load to Docker for running tests)
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          push: false
-          load: true
-          tags: aceest-fitness:ci
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache-new
-
-      - name: Move cache (workaround for cache GH action)
+      - name: Install dependencies
         run: |
-          rm -rf /tmp/.buildx-cache
-          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest
 
-      - name: Run pytest inside the container
-        run: docker run --rm aceest_fitness_flask pytest -q --junitxml=reports/junit.xml
+      - name: Run tests
+        run: pytest tests/
 
-      - name: Upload test report artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: pytest-report
-          path: reports/junit.xml
+      - name: Build Docker image
+        run: docker build -t aceest_fitness_flask .
